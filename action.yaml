@@ -21,6 +21,7 @@ runs:
         sudo mkdir -p /usr/local/bin/k3d-orig
         sudo chown -R $USER /usr/local/bin/k3d-orig
         mkdir -p ${{ github.action_path }}/.cache/{dockerhub,quay,ghcr}
+        echo "/usr/local/bin/k3d-orig" >> $GITHUB_PATH
 
     - name: Install Real k3d
       uses: nolar/setup-k3d-k3s@v1
