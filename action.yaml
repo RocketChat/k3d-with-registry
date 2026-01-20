@@ -23,7 +23,7 @@ runs:
         mkdir -p ${{ github.action_path }}/.cache/{dockerhub,quay,ghcr}
 
     - name: Install Real k3d
-      uses: nolar/setup-k3s-k3d@v1
+      uses: nolar/setup-k3d-k3s@v1
       with:
         skip-creation: true
       env:
