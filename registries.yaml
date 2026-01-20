@@ -1,0 +1,13 @@
+mirrors:
+  "docker.io":
+    endpoint:
+      - "http://proxy-dockerhub:5000"
+  "quay.io":
+    endpoint:
+      - "http://proxy-quay:5000"
+  "ghcr.io":
+    endpoint:
+      - "http://proxy-ghcr:5000"
+  "*":
+    endpoint:
+      - "http://proxy-dockerhub:5000" 
