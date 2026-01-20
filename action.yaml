@@ -21,8 +21,6 @@ runs:
         sudo mkdir -p /usr/local/bin/k3d-orig
         sudo chown -R $USER /usr/local/bin/k3d-orig
         mkdir -p ${{ github.action_path }}/.cache/{dockerhub,quay,ghcr}
-        echo "OLD_PATH=$PATH" >>$GITHUB_ENV
-        echo "/usr/local/bin/k3d-orig" >> $GITHUB_PATH
 
     - name: Install Real k3d
       uses: nolar/setup-k3d-k3s@v1
@@ -30,6 +28,7 @@ runs:
         skip-creation: true
       env:
         K3D_INSTALL_DIR: /usr/local/bin/k3d-orig
+        PATH: /usr/local/bin/k3d-orig:${{ env.PATH }}
 
     - name: Setup Wrapper
       shell: bash
@@ -63,8 +62,3 @@ runs:
         cache_ghcr: ${{ github.action_path }}/.cache/ghcr
       run: |
         docker compose -f ${{ github.action_path }}/compose.yaml up -d
-
-    - name: Restore PATH
-      shell: bash
-      run: |
-        echo "PATH=$OLD_PATH" >>$GITHUB_ENV
