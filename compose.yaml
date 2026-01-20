@@ -5,7 +5,7 @@ services:
     environment:
       REGISTRY_PROXY_REMOTEURL: https://registry-1.docker.io
     volumes:
-      - cache_dockerhub:/var/lib/registry
+      - ${cache_dockerhub:-cache_dockerhub}:/var/lib/registry
 
   proxy-quay:
     image: registry:2
@@ -13,7 +13,7 @@ services:
     environment:
       REGISTRY_PROXY_REMOTEURL: https://quay.io
     volumes:
-      - cache_quay:/var/lib/registry
+      - ${cache_quay:-cache_quay}:/var/lib/registry
 
   proxy-ghcr:
     image: registry:2
@@ -21,7 +21,7 @@ services:
     environment:
       REGISTRY_PROXY_REMOTEURL: https://ghcr.io
     volumes:
-      - cache_ghcr:/var/lib/registry
+      - ${cache_ghcr:-cache_ghcr}:/var/lib/registry
 
 volumes:
   cache_dockerhub:

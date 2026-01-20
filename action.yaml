@@ -1,0 +1,63 @@
+name: 'k3d with Registry caching'
+description: 'Setup k3d with registry proxies and volume caching'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cache Registry Folders
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.action_path }}/.cache/dockerhub
+          ${{ github.action_path }}/.cache/quay
+          ${{ github.action_path }}/.cache/ghcr
+        key: k3d-reg-v1-${{ runner.os }}-${{ hashFiles(format('{0}/compose.yaml', github.action_path)) }}
+        restore-keys: |
+          k3d-reg-v1-${{ runner.os }}-
+
+    - name: Pre-create Directories
+      shell: bash
+      run: |
+        sudo mkdir -p /usr/local/bin/k3d-orig
+        sudo chown -R $USER /usr/local/bin/k3d-orig
+        mkdir -p ${{ github.action_path }}/.cache/{dockerhub,quay,ghcr}
+
+    - name: Install Real k3d
+      uses: nolar/setup-k3s-k3d@v1
+      with:
+        skip-creation: true
+      env:
+        K3D_INSTALL_DIR: /usr/local/bin/k3d-orig
+
+    - name: Setup Wrapper
+      shell: bash
+      run: |
+        K3D_PATH="/usr/local/bin/k3d-orig/k3d"
+        REGISTRIES_YAML="${{ github.action_path }}/registries.yaml"
+        
+        if [ -f "${{ github.action_path }}/k3d_alias.bash" ]; then
+          source "${{ github.action_path }}/k3d_alias.bash"
+        fi
+        
+        FUNCTION_BODY=$(declare -f __k3d_with_registry)
+
+        sudo tee /usr/local/bin/k3d > /dev/null << EOF
+        #!/bin/bash
+        K3D_PATH="$K3D_PATH"
+        PATH_TO_REGISTRIES_YAML="$REGISTRIES_YAML"
+        
+        $FUNCTION_BODY
+        
+        __k3d_with_registry "\$@"
+        EOF
+        
+        sudo chmod +x /usr/local/bin/k3d
+
+    - name: Start Proxy Fleet
+      shell: bash
+      env:
+        cache_dockerhub: ${{ github.action_path }}/.cache/dockerhub
+        cache_quay: ${{ github.action_path }}/.cache/quay
+        cache_ghcr: ${{ github.action_path }}/.cache/ghcr
+      run: |
+        docker compose -f ${{ github.action_path }}/compose.yaml up -d
