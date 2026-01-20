@@ -21,6 +21,7 @@ runs:
         sudo mkdir -p /usr/local/bin/k3d-orig
         sudo chown -R $USER /usr/local/bin/k3d-orig
         mkdir -p ${{ github.action_path }}/.cache/{dockerhub,quay,ghcr}
+        echo "/usr/local/bin/k3d-orig" >> $GITHUB_PATH
 
     - name: Install Real k3d
       uses: nolar/setup-k3d-k3s@v1
@@ -28,7 +29,6 @@ runs:
         skip-creation: true
       env:
         K3D_INSTALL_DIR: /usr/local/bin/k3d-orig
-        PATH: /usr/local/bin/k3d-orig:${{ env.PATH }}
 
     - name: Setup Wrapper
       shell: bash
@@ -42,7 +42,7 @@ runs:
         
         FUNCTION_BODY=$(declare -f __k3d_with_registry)
 
-        sudo tee /usr/local/bin/k3d > /dev/null << EOF
+        sudo tee /usr/local/bin/k3d << EOF
         #!/bin/bash
         K3D_PATH="$K3D_PATH"
         PATH_TO_REGISTRIES_YAML="$REGISTRIES_YAML"
