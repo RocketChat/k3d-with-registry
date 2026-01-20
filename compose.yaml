@@ -1,0 +1,33 @@
+services:
+  proxy-dockerhub:
+    image: registry:2
+    restart: always
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://registry-1.docker.io
+    volumes:
+      - cache_dockerhub:/var/lib/registry
+
+  proxy-quay:
+    image: registry:2
+    restart: always
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://quay.io
+    volumes:
+      - cache_quay:/var/lib/registry
+
+  proxy-ghcr:
+    image: registry:2
+    restart: always
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://ghcr.io
+    volumes:
+      - cache_ghcr:/var/lib/registry
+
+volumes:
+  cache_dockerhub:
+  cache_quay:
+  cache_ghcr:
+
+networks:
+  default:
+    name: registry-proxy-net

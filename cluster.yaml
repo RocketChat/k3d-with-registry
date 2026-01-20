@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/k3d-io/k3d/main/pkg/config/v1alpha5/schema.json
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: lab
+
+image: rancher/k3s:v1.27.4-k3s1
+servers: 1
+agents: 2
+network: registry-proxy-net
+
+ports:
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
+  - port: 443:443
+    nodeFilters:
+      - loadbalancer
+
+registries:
+  config: |
+    mirrors:
+      "docker.io":
+        endpoint:
+          - "http://proxy-dockerhub:5000"
+      "quay.io":
+        endpoint:
+          - "http://proxy-quay:5000"
+      "ghcr.io":
+        endpoint:
+          - "http://proxy-ghcr:5000"
+      "*":
+        endpoint:
+          - "http://proxy-dockerhub:5000"
