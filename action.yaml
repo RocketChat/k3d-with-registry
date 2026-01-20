@@ -53,6 +53,8 @@ runs:
         EOF
         
         sudo chmod +x /usr/local/bin/k3d
+        
+        echo "/usr/local/bin" >> $GITHUB_PATH # prepend again to shadow original k3d
 
     - name: Start Proxy Fleet
       shell: bash
